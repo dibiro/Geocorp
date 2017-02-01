@@ -20,16 +20,22 @@ Geocorp.controller('listado', function($scope, $http) {
   }
   $scope.login = function() {
     $.ajax({
-      url: 'http://geocorp-jm.codeanyapp.com/users/home.json',
-      type: 'POST',
+      url: 'http://geocorp-jm.codeanyapp.com/users/view/'+$scope.password+'.json',
+      type: 'GET',
       dataType: 'json',
       data: {
-        email: $scope.email,
-        password: $scope.password,
       },
     })
     .done(function(data) {
       console.log(data);
+      if (data.user.email==$scope.email) {
+        localStorage["user"] = JSON.stringify(data.user);
+        setTimeout(function(argument) {
+          window.location.replace("user.html");
+        }, 500)
+      }else {
+        $scope.mensaje_error_user = "Usuario O Contraseña Invalido"
+      }
     })
     .fail(function() {
 
