@@ -43,7 +43,7 @@ Geocorp.controller('listado', function($scope, $http) {
     });
   }
   $scope.buscar_paciente = function() {
-    var result = $.grep($scope.patients, function(e){ return e.people.cedula == $scope.cedula; });
+    var result = $.grep($scope.patients, function(e){ return e.cedula == $scope.cedula; });
     if (result.length == 0) {
       $scope.mensaje_error_paciente = "El Paciente No Esta Reguistrado"
     } else if (result.length == 1) {

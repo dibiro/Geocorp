@@ -45,7 +45,8 @@ Geocorp.controller('listado', function($scope, $http) {
       url: 'http://geocorp-jm.codeanyapp.com/hospitales/hospitales.json'
     }).then(function successCallback(response) {
       var separador = 1;
-      $.each(response.data.hospitales, function(index, val) {
+      var hospitales = response.data.hospitales;
+      $.each(hospitales, function(index, val) {
         separador++
         setTimeout(
           function() {
@@ -57,19 +58,21 @@ Geocorp.controller('listado', function($scope, $http) {
             var directionsService = new google.maps.DirectionsService();
             directionsService.route(request, function(response, status) {
               if (status == google.maps.DirectionsStatus.OK) {
-                directionsDisplay.setDirections(response);
                 $scope.lista.push({
                   center: val,
                   response: response,
                   mapa: directionsService,
-                  distancia: directionsDisplay.directions.routes[0].legs[0].distance.value,
-                  distancia_text: directionsDisplay.directions.routes[0].legs[0].distance.text,
+                  distancia: response.routes[0].legs[0].distance.value,
+                  distancia_text: response.routes[0].legs[0].distance.text,
                 });
-                $scope.lista.sort(function(a, b) {
-                    return parseFloat(a.distancia) - parseFloat(b.distancia);
-                });
+                if (hospitales.length==$scope.lista.length) {
+                  console.log(hospitales.length, $scope.lista)
+                  $scope.lista.sort(function(a, b) {
+                      return parseFloat(a.distancia) - parseFloat(b.distancia);
+                  });
                 // Display the route on the map.
-                directionsDisplay.setDirections($scope.lista[0].response);
+                  directionsDisplay.setDirections($scope.lista[0].response);
+                }
                 $scope.$apply();
               }
             });
@@ -85,7 +88,33 @@ Geocorp.controller('listado', function($scope, $http) {
   navigator.geolocation.getCurrentPosition( fn_ok, fn_mal, options);
   $scope.llamar = function (x) {
     directionsDisplay.setDirections(x.response);
-
+  }
+  $scope.emergencia = function () {    
+   $.ajax({
+     url: 'http://geocorp-jm.codeanyapp.com/geolocations/api',
+     type: 'GET',
+      dataType: 'json',
+     crossDomain: true,
+      xhrFields: {
+          withCredentials: true
+      },
+     data: {
+      status:"emergencia",
+      lalitud:intlatitude,
+      longitud:intlongitude,
+      patients:$scope.paciente.id,
+      },
+   })
+   .done(function(data) {
+    console.log(data)
+   })
+   .fail(function() {
+     console.log("error");
+   })
+   .always(function() {
+     console.log("complete");
+   });
+   
   }
   $scope.lout = function () {
     localStorage.removeItem("paciente");
