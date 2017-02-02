@@ -1,24 +1,14 @@
 $(window).resize(function() {
-  $("#mapa").css("width", $( ".container" ).width()).css("height", $( window ).height()-$("#atender").height());
+  $("#mapa").css("width", $( window ).width()).css("height", $( window ).height()-$("nav").height());
 });
-$("#mapa").css("width", $( ".container" ).width()).css("height", $( window ).height()-$("#atender").height());
+$("#mapa").css("width", $( window ).width()).css("height", $( window ).height()-$("nav").height());
 
 var Geocorp = angular.module("Geocorp", []);
 var actual = {};
 
 Geocorp.controller('listado', function($scope, $http) {
-  if (typeof(localStorage["select"]) != "undefined") {
-    $scope.select = JSON.parse(localStorage["select"]);
-    $scope.$apply()
-  } else {
-    $scope.select = {};
-    $scope.select.atendiendo = false;
-    $scope.select.atendiendo_mensaje = "Atender";
-    $scope.select.mensaje = "La primera Ubcacion mostrada esde la emergencia mas cercana";
-  }
-  if (typeof(localStorage["user"]) != "undefined") {
-    $scope.user = JSON.parse(localStorage["user"]);
-    navigator.geolocation.getCurrentPosition( fn_ok, fn_mal, options);
+  if (typeof(localStorage["paciente"]) != "undefined") {
+    $scope.paciente = JSON.parse(localStorage["paciente"]);
   }else {
     window.location.replace("/");
   }
@@ -52,10 +42,10 @@ Geocorp.controller('listado', function($scope, $http) {
     directionsDisplay.setMap(gMapa);
     $http({
       method: 'GET',
-      url: 'http://geocorp-jm.codeanyapp.com/geolocations/index.json'
+      url: 'http://geocorp-jm.codeanyapp.com/hospitales/hospitales.json'
     }).then(function successCallback(response) {
       var separador = 1;
-      $.each(response.data.geolocations, function(index, val) {
+      $.each(response.data.hospitales, function(index, val) {
         separador++
         setTimeout(
           function() {
@@ -80,7 +70,6 @@ Geocorp.controller('listado', function($scope, $http) {
                 });
                 // Display the route on the map.
                 directionsDisplay.setDirections($scope.lista[0].response);
-                $scope.selet = $scope.lista[0]
                 $scope.$apply();
               }
             });
@@ -93,21 +82,13 @@ Geocorp.controller('listado', function($scope, $http) {
       // or server returns response with an error status.
     });
   }
+  navigator.geolocation.getCurrentPosition( fn_ok, fn_mal, options);
   $scope.llamar = function (x) {
-    $scope.select = x;
     directionsDisplay.setDirections(x.response);
-    $scope.select.mensaje = "Usted Seleciono a";
-    $scope.select.atendiendo = false;
-    $scope.select.atendiendo_mensaje = "Atender";
-  }
-  $scope.atender = function(x) {
-    localStorage["select"] = JSON.stringify(x);
-    $scope.select.atendiendo = true;
-    $scope.select.atendiendo_mensaje = "Atendiendo...";
-    $scope.select.mensaje = "Usted Esta Atendiendo A";
+
   }
   $scope.lout = function () {
-    localStorage.removeItem("user");
+    localStorage.removeItem("paciente");
     window.location.replace("/");
   }
 });
